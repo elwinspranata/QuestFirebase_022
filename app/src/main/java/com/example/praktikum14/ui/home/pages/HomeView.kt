@@ -1,7 +1,12 @@
 package com.example.praktikum14.ui.home.pages
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -132,6 +137,34 @@ fun OnError(
     }
 }
 
+@Composable
+fun MhsLayout(
+    mahasiswa: List<Mahasiswa>,
+    modifier: Modifier = Modifier,
+    onDetailClick: (String) -> Unit,
+    onDeleteClick: (Mahasiswa) -> Unit = {}
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(
+            items() = mahasiswa,
+            itemContent = { mhs ->
+                MhsCard(
+                    mahasiswa = mhs,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {  },
+                    onDeleteClick = {
+                        onDeleteClick(mhs)
+                    }
+                )
+            }
+        )
+    }
+}
 
 
 
