@@ -1,5 +1,7 @@
 package com.example.praktikum14.repository
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import com.example.praktikum14.model.Mahasiswa
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -36,4 +38,30 @@ class NetworkRepositoryMhs(
         }
     }
 
+    override suspend fun deleteMhs(mahasiswa: Mahasiswa) {
+        try {
+            val querySnapshot = firestore.collection("Mahasiswa")
+                .whereEqualTo("nim", mahasiswa.nim)  // get documentID with field nim
+                .get()
+                .await()
+
+            if (querySnapshot.isEmpty) {
+                Log.e("NetworkRepositoryMhs", "Dokumen dengan nim ${mahasiswa.nim} tidak ditemukan")
+                return
+            }
+
+            val document = querySnapshot.documents.first() // Get top 1 if more than 1
+            val documentId = document.id  // Get Document ID
+
+            firestore.collection("Mahasiswa")
+                .document(documentId) // search by Document ID location
+                .delete()
+                .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
+                .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
+                .await()
+            Log.d("NetworkRepositoryMhs", "Berhasil menghapus data Mahasiswa: ${mahasiswa.nim}")
+        } catch (e: Exception) {
+            throw Exception("Gagal Menghapus data Mahasiswa: ${e.message}")
+        }
+    }
 
