@@ -1,5 +1,6 @@
 package com.example.praktikum14.ui.home.pages
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -12,9 +13,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.praktikum14.model.Mahasiswa
 import com.example.praktikum14.ui.PenyediaViewModel
 import com.example.praktikum14.ui.home.viewmodel.HomeViewModel
 
@@ -58,3 +62,45 @@ fun HomeScreen(
         )
     }
 }
+
+@Composable
+fun HomeStatus(
+    homeUiState: HomeUiState,
+    retryAction: () -> Unit,
+    modifier: Modifier = Modifier,
+    onDetailClick: (String) -> Unit,
+    onDeleteClick: (Mahasiswa) -> Unit = {},
+){
+    var deleteConfirmationRequired by rememberSaveable { mutableStateOf<Mahasiswa?>(null) }
+    when (homeUiState) {
+        is HomeUiState.Loading -> OnLoading(modifier = modifier.fillMaxSize())
+        is HomeUiState.Success -> {
+            MhsLayout(
+                mahasiswa = homeUiState.data, modifier = modifier.fillMaxWidth(), onDetailClick = {
+                    onDetailClick(it)
+                },
+                onDeleteClick = {
+                    onDeleteClick(it)
+                }
+            )
+            deleteConfirmationRequired?.let { data ->
+                DeleteConfirmationDialog(
+                    onDeleteConfirm = {
+                        onDeleteClick(data)
+                        deleteConfirmationRequired = null
+                    },
+                    onDeleteCancel = {
+                        deleteConfirmationRequired = null
+                    }
+                )
+            }
+        }
+
+        is HomeUiState.Error -> OnError(
+            retryAction,
+            modifier = modifier.fillMaxSize(),
+            message = homeUiState.e.message ?: "Error"
+        )
+    }
+}
+
