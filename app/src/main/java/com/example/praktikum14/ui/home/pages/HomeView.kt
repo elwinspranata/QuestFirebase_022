@@ -104,3 +104,34 @@ fun HomeStatus(
     }
 }
 
+@Composable
+fun OnLoading(modifier: Modifier = Modifier) {
+    Text("Loading......")
+}
+
+@Composable
+fun OnError(
+    retryAction: () -> Unit,
+    modifier: Modifier = Modifier,
+    message: String
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Terjadi Kesalahan : $message",
+            modifier = Modifier.padding(16.dp)
+        )
+        Button(
+            onClick = retryAction
+        ) {
+            Text("Retry")
+        }
+    }
+}
+
+
+
+
